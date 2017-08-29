@@ -1,0 +1,140 @@
+{
+  "contract_name": "Splitter",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "beneficiaryOne",
+          "type": "address"
+        },
+        {
+          "name": "beneficiaryTwo",
+          "type": "address"
+        }
+      ],
+      "name": "registerSplit",
+      "outputs": [],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "sendSplit",
+      "outputs": [],
+      "payable": true,
+      "type": "function"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "one",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "two",
+          "type": "address"
+        }
+      ],
+      "name": "SplitRegistered",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "one",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "two",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "EtherSplit",
+      "type": "event"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b6102f18061001f6000396000f300606060405263ffffffff60e060020a60003504166346da4605811461002f578063aa92f2d814610056575b600080fd5b341561003a57600080fd5b610054600160a060020a0360043581169060243516610060565b005b610054610151565b005b6100686102ae565b600160a060020a0380841682528281166020808401919091523390911660009081529081905260409020819081518154600160a060020a031916600160a060020a0391909116178155602082015160019182018054600160a060020a031916600160a060020a039283161790553390811660009081526020839052604090819020805460ff19169093179092557fdd2976ad0ab36e570ca13b82715579d81859b586e3faeb1da33a4bdc2ff973c49250908590859051600160a060020a03938416815291831660208301529091166040808301919091526060909101905180910390a15b505050565b600061015b6102ae565b600160a060020a03331660009081526001602052604090205460ff16151561018257600080fd5b6000341161018f57600080fd5b6002345b04915060008033600160a060020a0316600160a060020a03168152602001908152602001600020604080519081016040528154600160a060020a039081168252600190920154909116602082015290508051600160a060020a031682156108fc0283604051600060405180830381858888f19350505050151561021557600080fd5b8060200151600160a060020a031682156108fc0283604051600060405180830381858888f19350505050151561024a57600080fd5b7f4cb606a69c18765760d8af20bbfa6f8082251c21dc1855fe1b651627d3e6f387338251836020015185604051600160a060020a039485168152928416602084015292166040808301919091526060820192909252608001905180910390a15b5050565b6040805190810160405260008082526020820152905600a165627a7a723058207e2927b88f89bd657f624e41a73a03e642fd7810693aac101648f09daa9db55a0029",
+  "networks": {
+    "1503864583154": {
+      "events": {
+        "0xdd2976ad0ab36e570ca13b82715579d81859b586e3faeb1da33a4bdc2ff973c4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "one",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "two",
+              "type": "address"
+            }
+          ],
+          "name": "SplitRegistered",
+          "type": "event"
+        },
+        "0x4cb606a69c18765760d8af20bbfa6f8082251c21dc1855fe1b651627d3e6f387": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "name": "from",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "one",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "two",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "name": "EtherSplit",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x33437474215daf6413127cca83bafa2e398a3e30",
+      "updated_at": 1503866025360
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1503866025360
+}
