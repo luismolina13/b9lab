@@ -22,7 +22,7 @@ contract Hub is Stoppable {
         return campaigns.length;
     }
 
-    function newCampaign(uint campaignDuration, uint campaignGoal) public
+    function createCampaign(uint campaignDuration, uint campaignGoal) public
         returns (address campaignContract) {
         Campaign trustedCampaign = new Campaign(msg.sender, campaignDuration,
             campaignGoal);
