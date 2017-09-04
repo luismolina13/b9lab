@@ -1,10 +1,10 @@
 pragma solidity ^0.4.6;
 
-import "./Owned.sol";
 import "./Stoppable.sol";
 
 contract Campaign is Stoppable {
 
+    address sponsor;
     uint public deadline;
     uint public goal;
     uint public fundsRaised;
@@ -19,10 +19,16 @@ contract Campaign is Stoppable {
     event LogRefundSent(address funder, uint amount);
     event LogWithdraw(address beneficiary, uint amount);
 
-    function Campaign(uint duration, uint _goal) {
+    modifier onlySponsor() {
+        require(msg.sender == sponsor);
+        _;
+    }
+
+    function Campaign(address _sponsor, uint duration, uint _goal) {
         owner = msg.sender;
         deadline = block.number + duration;
         goal = _goal;
+        sponsor = _sponsor;
     }
 
     function isSuccess() public constant returns (bool isIndeed) {
@@ -45,7 +51,7 @@ contract Campaign is Stoppable {
         return true;
     }
 
-    function withdrawFunds() public onlyIfRunning onlyOwner returns (bool success) {
+    function withdrawFunds() public onlyIfRunning onlySponsor returns (bool success) {
         require(isSuccess());
 
         uint amount = this.balance;

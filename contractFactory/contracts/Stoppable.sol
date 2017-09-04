@@ -5,7 +5,7 @@ import "./Owned.sol";
 contract Stoppable is Owned {
     bool public running;
 
-    event LogRunSwitch(bool switchSetting);
+    event LogRunSwitch(address sender, bool switchSetting);
 
     function Stoppable() {
         running = true;
@@ -17,7 +17,7 @@ contract Stoppable is Owned {
     }
 
     function runSwitch(bool onOff) public onlyOwner returns (bool success) {
-        LogRunSwitch(onOff);
+        LogRunSwitch(msg.sender, onOff);
         running = onOff;
         return true;
     }
