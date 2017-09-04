@@ -1,5 +1,5 @@
-var Campaign = artifacts.require("./Campaign.sol");
+var Hub = artifacts.require("./Hub.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(Campaign);
+  deployer.deploy(Hub);
 };
