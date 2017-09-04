@@ -1,12 +1,13 @@
 pragma solidity ^0.4.6;
 
-contract Campaign {
+import "./Owned.sol";
+import "./Stoppable.sol";
 
-    address public owner;
+contract Campaign is Stoppable {
+
     uint public deadline;
     uint public goal;
     uint public fundsRaised;
-    bool public running;
 
     struct FunderStruct {
         uint amount;
@@ -18,21 +19,10 @@ contract Campaign {
     event LogRefundSent(address funder, uint amount);
     event LogWithdraw(address beneficiary, uint amount);
 
-    modifier onlyIfRunning() {
-        require(running);
-        _;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
-    }
-
     function Campaign(uint duration, uint _goal) {
         owner = msg.sender;
         deadline = block.number + duration;
         goal = _goal;
-        running = true;
     }
 
     function isSuccess() public constant returns (bool isIndeed) {
@@ -41,11 +31,6 @@ contract Campaign {
 
     function hasFailed() public constant returns (bool hasIndeed) {
         return(fundsRaised < goal && block.number > deadline);
-    }
-
-    function runSwitch(bool onOff) public onlyOwner returns (bool success) {
-        running = onOff;
-        return true;
     }
 
     function contribute() public onlyIfRunning payable returns (bool success) {
