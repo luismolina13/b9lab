@@ -8,6 +8,7 @@ contract Campaign is Stoppable {
     uint public deadline;
     uint public goal;
     uint public fundsRaised;
+    uint public withdrawn;
 
     struct FunderStruct {
         uint amount;
@@ -55,6 +56,7 @@ contract Campaign is Stoppable {
         require(isSuccess());
 
         uint amount = this.balance;
+        withdrawn += amount;
         owner.transfer(amount);
 
         LogWithdraw(msg.sender, amount);

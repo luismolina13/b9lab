@@ -13,10 +13,6 @@ module.exports = {
       { from: './app/index.html', to: "index.html" }
     ])
   ],
-  node: {
-    fs: 'empty',
-    child_process: 'empty'
-  },
   module: {
     rules: [
       {
