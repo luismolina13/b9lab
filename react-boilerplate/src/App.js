@@ -13,8 +13,22 @@ class App extends Component {
 
     this.state = {
       storageValue: 0,
-      web3: null
+      web3: null,
+      storageContractInstance: null,
+      account: null
     }
+  }
+
+  addEventListener(component) {
+    var updateEvent = this.storageContractInstance.Changed()
+    updateEvent.watch(function(err, result) {
+      if (err) {
+        console.log(err)
+        return
+      }
+      console.log("Changed event received, value: " + result.args._value.c[0])
+      component.setState({ storageValue: result.args._value.c[0]})
+    })
   }
 
   componentWillMount() {
@@ -56,6 +70,9 @@ class App extends Component {
         simpleStorageInstance = instance
 
         // Stores a given value, 5 by default.
+        this.storageContractInstance = instance
+        this.account = accounts[0]
+        this.addEventListener(this)
         return simpleStorageInstance.set(5, {from: accounts[0]})
       }).then((result) => {
         // Get the value from the contract to prove it worked.
@@ -65,6 +82,10 @@ class App extends Component {
         return this.setState({ storageValue: result.c[0] })
       })
     })
+  }
+
+  updateValue(val) {
+    return this.storageContractInstance.set(val, {from: this.account})
   }
 
   render() {
@@ -83,6 +104,7 @@ class App extends Component {
               <p>If your contracts compiled and migrated successfully, below will show a stored value of 5 (by default).</p>
               <p>Try changing the value stored on <strong>line 59</strong> of App.js.</p>
               <p>The stored value is: {this.state.storageValue}</p>
+              <button className="changeButton" onClick={() => this.updateValue(2)}>change value</button>
             </div>
           </div>
         </main>
