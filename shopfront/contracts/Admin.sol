@@ -2,8 +2,8 @@ pragma solidity ^0.4.0;
 
 contract Admin {
 
-    mapping(address => bool) admins;
-    address owner;
+  mapping(address => bool) public admins;
+  address public owner;
 
     event LogAdminAdded(address);
     event LogAdminRemoved(address);

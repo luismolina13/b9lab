@@ -4,15 +4,28 @@ import "./Admin.sol";
 import "./Product.sol";
 
 contract Shopfront is Admin {
-    Product[] products;
-    mapping(string => Product) productsMap;
-    mapping(address => Product[]) productsOwned;
+    address[] public products;
+    address[] public productOwners;
+
+    // Tursted products = true
+    mapping(address => bool) public trustedProducts;
+
+    // User address to list of product addresses
+    mapping(address => address[]) public productsOwned;
 
     event LogProductAdded(uint stock, uint price, string id);
-    event LogProductBought(string id, address buyer);
+    event LogProductBought(address product, address buyer);
 
     function Shopfront() {
         owner = msg.sender;
+    }
+
+    function getProductsCount() public constant returns(uint) {
+      return products.length;
+    }
+
+    function getProduct(uint index) public constant returns(address) {
+      return products[index];
     }
 
     function addProduct(uint stock, uint price, string id) public isAdmin {
@@ -20,17 +33,20 @@ contract Shopfront is Admin {
 
         Product product = new Product(stock, price, id);
         products.push(product);
+        trustedProducts[product] = true;
 
         LogProductAdded(stock, price, id);
     }
 
-    function buyProduct(string id) public payable {
+    function buyProduct(address productAddress) public payable {
         require(msg.value > 0);
-        Product product = productsMap[id];
+        require(trustedProducts[productAddress]);
+        Product product = Product(productAddress);
         require(msg.value > product.price());
 
         product.remove();
         productsOwned[msg.sender].push(product);
-        LogProductBought(id, msg.sender);
+        productOwners.push(msg.sender);
+        LogProductBought(product, msg.sender);
     }
 }

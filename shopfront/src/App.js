@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
-import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import ShopfrontContract from '../build/contracts/Shopfront.json'
+import AdminContract from '../build/contracts/Admin.json'
+import ProductContract from '../build/contracts/Product.json'
 import getWeb3 from './utils/getWeb3'
+import Product from './Product'
 
 import './css/oswald.css'
 import './css/open-sans.css'
@@ -12,17 +15,27 @@ class App extends Component {
     super(props)
 
     this.state = {
-      storageValue: 0,
-      web3: null
+      web3: null,
+      shopfront: null,
+      admin: null,
+      accounts: null,
+      owner: null,
+      products: [],
+      id: '',
+      price: '',
+      stock: ''
     }
+
+    this.handleIdChange = this.handleIdChange.bind(this);
+    this.handlePriceChange = this.handlePriceChange.bind(this);
+    this.handleStockChange = this.handleStockChange.bind(this);
   }
 
   componentWillMount() {
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
 
-    getWeb3
-    .then(results => {
+    getWeb3.then(results => {
       this.setState({
         web3: results.web3
       })
@@ -44,45 +57,110 @@ class App extends Component {
      */
 
     const contract = require('truffle-contract')
-    const simpleStorage = contract(SimpleStorageContract)
-    simpleStorage.setProvider(this.state.web3.currentProvider)
-
-    // Declaring this for later so we can chain functions on SimpleStorage.
-    var simpleStorageInstance
+    const shopfront = contract(ShopfrontContract)
+    const Admin = contract(AdminContract)
+    const Product = contract(ProductContract)
+    shopfront.setProvider(this.state.web3.currentProvider)
+    Admin.setProvider(this.state.web3.currentProvider)
+    Product.setProvider(this.state.web3.currentProvider)
 
     // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      simpleStorage.deployed().then((instance) => {
-        simpleStorageInstance = instance
-
-        // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, {from: accounts[0]})
-      }).then((result) => {
+      shopfront.deployed().then((instance) => {
+        this.shopfront = instance
+        this.admin = Admin.at(instance.address);
+        this.accounts = accounts
+        console.log(this.shopfront);
+        // console.log(this.admin);
+        return this.shopfront.getProductsCount();
+      }).then((count) => {
+        console.log(parseInt(count))
+        return Promise.all(Array.from(Array(parseInt(count)).keys()).map(x => this.shopfront.getProduct(x)));
+      }).then((products) => {
+        console.log(products);
+        this.setState({products: products});
+      }).then(() => {
+        return this.admin.owner.call({from: this.accounts[0]})
+      }).then((owner) => {
         // Get the value from the contract to prove it worked.
-        return simpleStorageInstance.get.call(accounts[0])
-      }).then((result) => {
-        // Update state with the result.
-        return this.setState({ storageValue: result.c[0] })
+        console.log(owner);
+        return this.setState({owner: owner});
       })
     })
   }
 
+  addProduct() {
+    var self = this;
+    if(parseInt(this.state.price) > 0 && parseInt(this.state.stock) > 0) {
+      this.shopfront.addProduct(this.state.stock, this.state.price, this.state.id,
+        {from: this.accounts[0], gas: 4000000})
+      .then(function(txn) {
+        console.log(txn)
+        self.setState({
+          stock: "",
+          id: "",
+          price: ""
+        });
+      });
+    } else {
+      alert('Integers over Zero, please');
+    }
+  }
+
+  handleStockChange(e) {
+    this.setState({stock: e.target.value});
+  }
+
+  handleIdChange(e) {
+    this.setState({id: e.target.value});
+  }
+
+  handlePriceChange(e) {
+    this.setState({price: e.target.value});
+  }
+
   render() {
+    const products = this.state.products.map((address) => {
+      return (
+        <Product
+          key={address}
+          address={address}
+          web3={this.state.web3}
+        />
+      );
+    });
+
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+            <a href="#" className="pure-menu-heading pure-menu-link">Shop Front</a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
-              <h1>Good to Go!</h1>
-              <p>Your Truffle Box is installed and ready.</p>
-              <h2>Smart Contract Example</h2>
-              <p>If your contracts compiled and migrated successfully, below will show a stored value of 5 (by default).</p>
-              <p>Try changing the value stored on <strong>line 59</strong> of App.js.</p>
-              <p>The stored value is: {this.state.storageValue}</p>
+              <h1>Shopfront</h1>
+              <p>The owner of the Shopfront is: {this.state.owner}</p>
+              <form>
+                <input type="text" name="id" placeholder="id" value={this.state.id} onChange={this.handleIdChange} />
+                <input type="text" name="price" placeholder="price" value={this.state.price} onChange={this.handlePriceChange} />
+                <input type="text" name="stock" placeholder="stock" value={this.state.stock} onChange={this.handleStockChange} />
+                <button type="button" onClick={() => this.addProduct()}>Add Product</button>
+              </form>
+              <br/>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Address</th>
+                    <th>Id</th>
+                    <th>Price (Wei)</th>
+                    <th>Stock</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products}
+                </tbody>
+              </table>
             </div>
           </div>
         </main>
