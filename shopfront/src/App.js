@@ -16,14 +16,9 @@ class App extends Component {
 
     this.state = {
       web3: null,
-      shopfront: null,
-      admin: null,
       accounts: null,
       owner: null,
-      products: [],
-      id: '',
-      price: '',
-      stock: ''
+      products: []
     }
 
     this.handleIdChange = this.handleIdChange.bind(this);
@@ -90,21 +85,26 @@ class App extends Component {
   }
 
   addProduct() {
-    var self = this;
     if(parseInt(this.state.price) > 0 && parseInt(this.state.stock) > 0) {
       this.shopfront.addProduct(this.state.stock, this.state.price, this.state.id,
         {from: this.accounts[0], gas: 4000000})
       .then(function(txn) {
         console.log(txn)
-        self.setState({
-          stock: "",
-          id: "",
-          price: ""
-        });
       });
     } else {
       alert('Integers over Zero, please');
     }
+  }
+
+  buyProduct(address, price) {
+    console.log("Product Address:", address, "Product price:", parseInt(price));
+    this.shopfront.buyProduct(address, {
+      from: this.accounts[0],
+      value: parseInt(price),
+      gas: 4000000
+    }).then(function(txn) {
+      console.log(txn);
+    })
   }
 
   handleStockChange(e) {
@@ -126,6 +126,7 @@ class App extends Component {
           key={address}
           address={address}
           web3={this.state.web3}
+          buy={(address, price) => this.buyProduct(address, price)}
         />
       );
     });
@@ -155,6 +156,7 @@ class App extends Component {
                     <th>Id</th>
                     <th>Price (Wei)</th>
                     <th>Stock</th>
+                    <th></th>
                   </tr>
                 </thead>
                 <tbody>

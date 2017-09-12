@@ -13,8 +13,8 @@ contract Shopfront is Admin {
     // User address to list of product addresses
     mapping(address => address[]) public productsOwned;
 
-    event LogProductAdded(uint stock, uint price, string id);
-    event LogProductBought(address product, address buyer);
+    event LogProductAdded(uint stock, uint price, string id, address product);
+    event LogProductBought(address product, address buyer, uint price, uint paid);
 
     function Shopfront() {
         owner = msg.sender;
@@ -35,18 +35,19 @@ contract Shopfront is Admin {
         products.push(product);
         trustedProducts[product] = true;
 
-        LogProductAdded(stock, price, id);
+        LogProductAdded(stock, price, id, product);
     }
 
     function buyProduct(address productAddress) public payable {
         require(msg.value > 0);
         require(trustedProducts[productAddress]);
         Product product = Product(productAddress);
-        require(msg.value > product.price());
+        uint price = product.price();
+        require(msg.value >= price);
 
         product.remove();
         productsOwned[msg.sender].push(product);
         productOwners.push(msg.sender);
-        LogProductBought(product, msg.sender);
+        LogProductBought(product, msg.sender, price, msg.value);
     }
 }

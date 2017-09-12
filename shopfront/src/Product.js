@@ -1,8 +1,5 @@
 import React, { Component } from 'react'
-import ShopfrontContract from '../build/contracts/Shopfront.json'
-import AdminContract from '../build/contracts/Admin.json'
 import ProductContract from '../build/contracts/Product.json'
-import getWeb3 from './utils/getWeb3'
 
 class Product extends Component {
   constructor(props) {
@@ -17,14 +14,13 @@ class Product extends Component {
   componentWillMount() {
     const contract = require('truffle-contract')
     const Product = contract(ProductContract)
-    console.log(this.props);
     Product.setProvider(this.props.web3.currentProvider)
 
-    this.state.product = Product.at(this.props.address);
+    this.product = Product.at(this.props.address);
     return Promise.all([
-      this.state.product.id(),
-      this.state.product.price(),
-      this.state.product.stock()
+      this.product.id(),
+      this.product.price(),
+      this.product.stock()
     ]).then(productData => {
       this.setState({
         id: productData[0],
@@ -40,6 +36,7 @@ class Product extends Component {
         <td>{this.state.id}</td>
         <td>{this.state.price}</td>
         <td>{this.state.stock}</td>
+        <td><button type="button" onClick={() => this.props.buy(this.props.address, this.state.price)}>Buy</button></td>
       </tr>
     )
   }
