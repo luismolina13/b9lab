@@ -7,6 +7,8 @@ contract Shopfront is Admin {
     address[] public products;
     address[] public productOwners;
 
+    uint public shopBalance;
+
     // Tursted products = true
     mapping(address => bool) public trustedProducts;
 
@@ -15,6 +17,7 @@ contract Shopfront is Admin {
 
     event LogProductAdded(uint stock, uint price, string id, address product);
     event LogProductBought(address product, address buyer, uint price, uint paid);
+    event LogTransfer(address owner, uint oldBalance, uint newBalance);
 
     function Shopfront() {
         owner = msg.sender;
@@ -29,8 +32,6 @@ contract Shopfront is Admin {
     }
 
     function addProduct(uint stock, uint price, string id) public isAdmin {
-        require(msg.sender == owner);
-
         Product product = new Product(stock, price, id);
         products.push(product);
         trustedProducts[product] = true;
@@ -45,9 +46,23 @@ contract Shopfront is Admin {
         uint price = product.price();
         require(msg.value >= price);
 
+        shopBalance += msg.value;
+
         product.remove();
         productsOwned[msg.sender].push(product);
         productOwners.push(msg.sender);
         LogProductBought(product, msg.sender, price, msg.value);
+    }
+
+    function pay(uint amount, address to) public isOwner {
+        require(amount <= shopBalance);
+        uint oldBalance = shopBalance;
+        shopBalance -= amount;
+        to.transfer(amount);
+        LogTransfer(to, oldBalance, shopBalance);
+    }
+
+    function withdraw(uint amount) public isOwner {
+        pay(amount, owner);
     }
 }

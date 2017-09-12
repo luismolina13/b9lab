@@ -20,7 +20,6 @@ contract Product {
     }
 
     function remove() public {
-        require(stock > 0);
         uint oldStock = stock;
         stock -= 1;
         LogStockChanged(oldStock, stock);
